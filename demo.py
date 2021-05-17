@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-import utils
-import main
+from domijan2015 import utils
+from domijan2015 import main
 
 # Do you want to save the result plots?
 def run_demo():
@@ -15,7 +15,7 @@ def run_demo():
         print("doing ", str(i))
         input, illusion_name, cut_height = utils.generate_input(i)
         M, N = input.shape
-        res = main.main(None, {"S":S}, {illusion_name: input})[illusion_name]
+        res = main.main(input, S)
         #{"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "M_ON": M_ON, "M_OFF": M_OFF}
         c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
             res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["M_ON"], res["M_OFF"], \
