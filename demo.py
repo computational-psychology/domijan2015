@@ -1,3 +1,13 @@
+"""
+This Python script demonstrates how the Domijan model could be used to reproduce all the results
+shown in the original paper: Domijan (2015): A Neurocomputational account of the role of contour
+facilitation in brightness perception
+
+This Python code was adapted from MATLAB scripts that were kindly provided by Drazan Domijan.
+
+@authors: Matko Matic & Lynn Schmittwilken
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,17 +16,23 @@ from matplotlib.animation import FuncAnimation
 from domijan2015 import utils
 from domijan2015 import main
 
-# Do you want to save the result plots?
+
 def run_demo():
+    # Do you want to save the result plots?´
     save_plot = True
-    cut_height = 55
+
+    # Amount of padding to add a gray background behind the stimuli:
     S = 20
-    for i in range(1, 13): # if you want to run only specific inputs, use list of the indices you want instead of range(1,13)
-        print("doing ", str(i))
-        input, illusion_name, cut_height = utils.generate_input(i)
-        M, N = input.shape
-        res = main.main(input, S)
-        #{"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "M_ON": M_ON, "M_OFF": M_OFF}
+
+    # If you want to run specific inputs, use list of the indices you want instead of range(1,13)
+    for i in range(1, 13):
+        print("Processing stimulus", str(i))
+        # Create the input stimulus:
+        input_stim, illusion_name, cut_height = utils.generate_input(i)
+        M, N = input_stim.shape
+
+        # Run the model:
+        res = main.main(input_stim, S)
         c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
             res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["M_ON"], res["M_OFF"], \
             res["LBD_h"], res["LBD_v"], res["GBD_h"], res["GBD_v"], res["R_h"], res["R_v"], res["bright"]
@@ -35,7 +51,7 @@ def run_demo():
             plot2(save_path, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v)
 
             # Plot 3: Brightness estimate
-            plot3(save_path, input, bright, cut_height, N + S)
+            plot3(save_path, input_stim, bright, cut_height, N + S)
 
 
 # Plot first part of results:
