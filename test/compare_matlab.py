@@ -19,7 +19,7 @@ from domijan2015 import utils
 from domijan2015 import main
 
 
-def run_demo():
+def run_comparison():
     # Do you want to save the result plots?´
     save_plot = True
 
@@ -74,4 +74,4 @@ def plot_comparison(save_path, bright_mat, bright):
     plt.close()
 
 
-run_demo()
+run_comparison()
