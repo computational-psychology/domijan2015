@@ -159,7 +159,7 @@ def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P):
 
     # Reduce output size to remove some background:
     R = R_full[P:M + P, P:N + P]
-    return R, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v
+    return R
 
 
 # Function that generates output of the Boundary Contour System:

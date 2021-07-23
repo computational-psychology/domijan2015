@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='domijan',
+setup(name='domijan2015',
       version='0.1',
       description='Domijan2015',
       author='Lynn Schmittwilken',

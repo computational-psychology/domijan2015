@@ -105,6 +105,6 @@ def fill_in(R, m_ON, m_OFF):
 
     bright_raw = utils.threshold( M_ON[1:M+1, 1:N+1] - T_f) - utils.threshold( M_OFF[1:M+1, 1:N+1] - T_f)
     bright_raw = bright_raw + np.abs(bright_raw.min())
-    bright = bright_raw / bright_raw.max()
+    bright = np.array(bright_raw / bright_raw.max())
     return bright, M_ON, M_OFF, M_ON_vid, M_OFF_vid
 

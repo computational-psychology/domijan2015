@@ -287,6 +287,13 @@ def add_surround(input_raw, size=20):
     image[size - 1:M + size - 1, size - 1:N + size - 1] = input_raw
     return image
 
+def remove_surround(input_raw, size=20):
+    img = np.delete(input_raw, np.s_[:size], 0)
+    img = np.delete(img, np.s_[-size:], 0)
+    img = np.delete(img, np.s_[:size], 1)
+    img = np.delete(img, np.s_[-size:], 1)
+    return img
+
 
 
 def img_to_png(img):

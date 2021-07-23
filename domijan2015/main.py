@@ -33,12 +33,11 @@ def main(stimulus, S):
     m_OFF = w1*c_OFF + w2*l_OFF
 
     # Contour detection and processing:
-    R, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v = boundary_detection.BCS(c_ON, c_OFF)
+    R = boundary_detection.BCS(c_ON, c_OFF)
 
     # Filling-in:
     bright, M_ON, M_OFF, _, _ = filling_in.fill_in(R, m_ON, m_OFF)
 
-    output= {"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "M_ON": M_ON, "M_OFF": M_OFF, "LBD_h": LBD_h,
-            "LBD_v": LBD_v, "GBD_h":GBD_h, "GBD_v": GBD_v, "R_h": R_h, "R_v": R_v, "bright": bright, "image": bright}
+    output= {"image": bright}
 
     return output
