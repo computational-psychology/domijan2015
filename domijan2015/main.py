@@ -17,7 +17,7 @@ from . import utils, retina, boundary_detection, filling_in
 
 
 # Run the simulations for 12 brightness illusions:
-def main(stimulus, S):
+def main(stimulus, S, extensive=False):
 
     input_image = utils.add_surround(stimulus, S)
 
@@ -33,11 +33,16 @@ def main(stimulus, S):
     m_OFF = w1*c_OFF + w2*l_OFF
 
     # Contour detection and processing:
-    R = boundary_detection.BCS(c_ON, c_OFF)
+    bcs_res = boundary_detection.BCS(c_ON, c_OFF, extensive=extensive)
+    R = bcs_res["R"]
 
     # Filling-in:
-    bright, M_ON, M_OFF, _, _ = filling_in.fill_in(R, m_ON, m_OFF)
+    bright, M_ON, M_OFF = filling_in.fill_in(R, m_ON, m_OFF)
+    if extensive:
+        output = {"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "m_ON": m_ON, "m_OFF": m_OFF, "R_h": bcs_res["R_h"], "R_v": bcs_res["R_v"],
+                  "image": bright, "LBD_h": bcs_res["LBD_h"], "LBD_v": bcs_res["LBD_v"], "GBD_h": bcs_res["GBD_h"], "GBD_v": bcs_res["GBD_v"]}
+    else:
+        output= {"image": bright}
 
-    output= {"image": bright}
 
     return output

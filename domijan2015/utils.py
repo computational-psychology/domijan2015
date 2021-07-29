@@ -2,6 +2,7 @@ import numpy as np
 import io
 import matplotlib.pyplot as plt
 from PIL import Image
+from matplotlib.animation import FuncAnimation
 
 
 
@@ -22,6 +23,46 @@ def heaviside(x):
 def sigmoid(S_max, x):
     y = (x < S_max) * (x * (x > 0).astype(np.float)) + S_max * (x >= S_max)
     return np.abs(y)
+
+
+
+# Save a video:
+def save_video(video1, video2, fname, fps, figsize=(10, 3)):
+    """
+    Save 3D arrays as MP4 videos, using matplotlib.animate.
+    parameters
+    ------------
+    video - 3D array, where the last dimension is the time dimension
+    fname - file basename (without type ending)
+    figsize - of underlying matplotlib figure
+    """
+    fig = plt.figure(figsize=figsize)
+    ax1 = plt.subplot(121)
+    im1 = plt.imshow(video1[:, :, 0], cmap='coolwarm', vmin=video1.min(), vmax=video1.max())
+    plt.clim(-video1.max(), video1.max())
+    plt.title('ON pathway: Frame 000')
+    plt.axis('off')
+    ax2 = plt.subplot(122)
+    im2 = plt.imshow(video2[:, :, 0], cmap='coolwarm', vmin=video2.min(), vmax=video2.max())
+    plt.clim(-video2.max(), video2.max())
+    plt.title('OFF pathway: Frame 000')
+    plt.axis('off')
+
+    def animate(i):
+        im1.set_array(video1[:, :, i])
+        ax1.set_title(f'ON pathway: Frame {i:03d}')
+        plt.axis('off')
+
+        im2.set_array(video2[:, :, i])
+        ax2.set_title(f'OFF pathway: Frame {i:03d}')
+        plt.axis('off')
+
+    n_frames = np.size(video1, 2)
+    anim = FuncAnimation(fig, animate, frames=n_frames)
+    anim.save('%s.gif' % fname, writer='imagemagick', fps=10)
+    plt.close()
+
+
 
 
 # Function that generates input image:

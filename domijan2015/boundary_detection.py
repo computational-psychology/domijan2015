@@ -145,7 +145,7 @@ def GBD(LBD_h, LBD_v, P, Q):
     return GBD_h, GBD_v
 
 
-def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P):
+def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P, extensive=False):
     M, N = LBD_h.shape
     M, N = M - 2 * P, N - 2 * P
 
@@ -159,11 +159,14 @@ def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P):
 
     # Reduce output size to remove some background:
     R = R_full[P:M + P, P:N + P]
-    return R
+    if extensive:
+        return{"R": R, "R_h": R_h, "R_v": R_v}
+    else:
+        return {"R": R}
 
 
 # Function that generates output of the Boundary Contour System:
-def BCS(c_ON, c_OFF):
+def BCS(c_ON, c_OFF, extensive = False):
 
     K = 12   # Number of orientations
     # Parameters simple cells:
@@ -182,4 +185,9 @@ def BCS(c_ON, c_OFF):
     T_r = 0.6      # Suppresses L/G Interaction output where their ratio is less than 1
     F = 0.01       # Controls the precision of the ratio computation
 
-    return LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P)
+    lgi_res = LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P, extensive=extensive)
+    R = lgi_res["R"]
+    if extensive:
+        return {"R": R, "R_h": lgi_res["R_h"], "R_v": lgi_res["R_v"], "LBD_h": LBD_h, "LBD_v": LBD_v, "GBD_h": GBD_h, "GBD_v": GBD_v}
+
+    return {"R": R}

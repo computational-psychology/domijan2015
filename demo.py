@@ -11,10 +11,10 @@ This Python code was adapted from MATLAB scripts that were kindly provided by Dr
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 from domijan2015 import utils
 from domijan2015 import main
+
 
 
 def run_demo():
@@ -32,10 +32,10 @@ def run_demo():
         M, N = input_stim.shape
 
         # Run the model:
-        res = main.main(input_stim, S)
-        c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
-            res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["M_ON"], res["M_OFF"], \
-            res["LBD_h"], res["LBD_v"], res["GBD_h"], res["GBD_v"], res["R_h"], res["R_v"], res["bright"]
+        res = main.main(input_stim, S, extensive=True)
+        c_ON, c_OFF, l_ON, l_OFF, m_ON, m_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
+            res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["m_ON"], res["m_OFF"], \
+            res["LBD_h"], res["LBD_v"], res["GBD_h"], res["GBD_v"], res["R_h"], res["R_v"], res["image"]
 
         if save_plot:
             # Create outputs folder:
@@ -45,7 +45,7 @@ def run_demo():
                 os.mkdir(result_folder)
 
             # Plot 1: Contrast, luminance and filling-in outputs
-            plot1(save_path, c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF)
+            plot1(save_path, c_ON, c_OFF, l_ON, l_OFF, m_ON, m_OFF)
 
             # Plot 2: BCS outputs
             plot2(save_path, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v)
@@ -177,41 +177,5 @@ def plot3(save_path, input_image, bright, cut_height, NS):
     plt.close()
 
 
-# Save a video:
-def save_video(video1, video2, fname, fps, figsize=(10, 3)):
-    """
-    Save 3D arrays as MP4 videos, using matplotlib.animate.
-    parameters
-    ------------
-    video - 3D array, where the last dimension is the time dimension
-    fname - file basename (without type ending)
-    figsize - of underlying matplotlib figure
-    """
-    fig = plt.figure(figsize=figsize)
-    ax1 = plt.subplot(121)
-    im1 = plt.imshow(video1[:, :, 0], cmap='coolwarm', vmin=video1.min(), vmax=video1.max())
-    plt.clim(-video1.max(), video1.max())
-    plt.title('ON pathway: Frame 000')
-    plt.axis('off')
-    ax2 = plt.subplot(122)
-    im2 = plt.imshow(video2[:, :, 0], cmap='coolwarm', vmin=video2.min(), vmax=video2.max())
-    plt.clim(-video2.max(), video2.max())
-    plt.title('OFF pathway: Frame 000')
-    plt.axis('off')
-
-    def animate(i):
-        im1.set_array(video1[:, :, i])
-        ax1.set_title(f'ON pathway: Frame {i:03d}')
-        plt.axis('off')
-
-        im2.set_array(video2[:, :, i])
-        ax2.set_title(f'OFF pathway: Frame {i:03d}')
-        plt.axis('off')
-
-    n_frames = np.size(video1, 2)
-    anim = FuncAnimation(fig, animate, frames=n_frames)
-    anim.save('%s.gif' % fname, writer='imagemagick', fps=10)
-    plt.close()
-
-
-run_demo()
+if __name__ == "__main__":
+    run_demo()
