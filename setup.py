@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="domijan2015",
@@ -7,7 +7,7 @@ setup(
     author="Lynn Schmittwilken",
     author_email="l.schmittwilken@tu-berlin.de",
     license="MIT",
-    packages=["domijan2015"],
+    packages=find_packages(),
     zip_safe=False,
     install_requires=["scipy", "numpy", "matplotlib", "pillow"],
 )
