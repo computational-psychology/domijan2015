@@ -1,6 +1,6 @@
 """
 This Python script can be used to compare our Python implementation of the Domijan2015 model with
-the original MATLAB scripts that were kindly provided by Drazan Domijan.
+the outputs of the original MATLAB scripts that were kindly provided by Drazan Domijan.
 
 This script compares the brightness estimates produced by the MATLAB implementation with the
 brightness estimates of our Python implementation by plotting those outputs side-by-side as well
@@ -34,15 +34,15 @@ def run_comparison():
 
         # Run the model:
         res = main.main(input_stim, S)
-        bright = res["bright"]
+        bright = res["image"]
 
         # Load Matlab model outputs:
-        outputs_mat = sio.loadmat('../matlab/outputs/' + illusion_name + '.mat')
+        outputs_mat = sio.loadmat('./matlab_ground_truth/' + illusion_name + '.mat')
         bright_mat = outputs_mat['bright']
 
         if save_plot:
             # Create outputs folder for comparisons:
-            result_folder = 'comparisons/'
+            result_folder = 'matlab_comparisons/'
             save_path = result_folder + illusion_name
             if not os.path.exists(result_folder):
                 os.mkdir(result_folder)
