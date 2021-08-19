@@ -18,7 +18,20 @@ from . import utils, retina, boundary_detection, filling_in
 
 # Run the simulations for 12 brightness illusions:
 def main(stimulus, S, extensive=False):
+    """
+    Parameters
+    -----------
+    stimulus : Stimulus object
+        stimulus on which the model should be run
+    S : int
+        size of the added padding during the model calculation
+    extensive : bool
+        should the model return intermediate results or not (e.g., used for the demo script to be able to plot the intermediate results)
 
+    Returns
+    -----------
+    {"image": output image} or {"image": output image, <all the intermediate results>}
+    """
     input_image = utils.add_surround(stimulus, S)
 
     # Extract contrast and luminance information:
@@ -39,7 +52,7 @@ def main(stimulus, S, extensive=False):
     # Filling-in:
     bright, M_ON, M_OFF = filling_in.fill_in(R, m_ON, m_OFF)
     if extensive:
-        output = {"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "m_ON": m_ON, "m_OFF": m_OFF, "R_h": bcs_res["R_h"], "R_v": bcs_res["R_v"],
+        output = {"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "M_ON": M_ON, "M_OFF": M_OFF, "R_h": bcs_res["R_h"], "R_v": bcs_res["R_v"],
                   "image": bright, "LBD_h": bcs_res["LBD_h"], "LBD_v": bcs_res["LBD_v"], "GBD_h": bcs_res["GBD_h"], "GBD_v": bcs_res["GBD_v"]}
     else:
         output= {"image": bright}

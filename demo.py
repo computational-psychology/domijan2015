@@ -33,8 +33,8 @@ def run_demo():
 
         # Run the model:
         res = main.main(input_stim, S, extensive=True)
-        c_ON, c_OFF, l_ON, l_OFF, m_ON, m_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
-            res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["m_ON"], res["m_OFF"], \
+        c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v, bright = \
+            res["c_ON"], res["c_OFF"], res["l_ON"], res["l_OFF"], res["M_ON"], res["M_OFF"], \
             res["LBD_h"], res["LBD_v"], res["GBD_h"], res["GBD_v"], res["R_h"], res["R_v"], res["image"]
 
         if save_plot:
@@ -45,7 +45,7 @@ def run_demo():
                 os.mkdir(result_folder)
 
             # Plot 1: Contrast, luminance and filling-in outputs
-            plot1(save_path, c_ON, c_OFF, l_ON, l_OFF, m_ON, m_OFF)
+            plot1(save_path, c_ON, c_OFF, l_ON, l_OFF, M_ON, M_OFF)
 
             # Plot 2: BCS outputs
             plot2(save_path, LBD_h, LBD_v, GBD_h, GBD_v, R_h, R_v)

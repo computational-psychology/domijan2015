@@ -7,7 +7,7 @@ current_dir = __file__
 
 project_path = os.path.abspath(current_dir + "../../../")
 sys.path.append(project_path)
-import utils, main
+from domijan2015 import utils, main
 
 
 sep = os.path.sep
@@ -44,13 +44,13 @@ def test_everything():
         "GBD_v",
         "R_h",
         "R_v",
-        "bright"
+        "image"
     )
 
 
     for i in illusions_to_test:
         img, name, _ = utils.generate_input(i)
-        res = main.model(img, 20)
+        res = main.main(img, 20, extensive=True)
         for param in parameters_to_test:
             output = utils.img_to_png(res[param])
             test_output = np.asarray(
