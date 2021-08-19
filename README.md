@@ -4,6 +4,11 @@
 
 This repository contains a re-implementation of the physiologically-inspired brightness perception model presented in Domijan (2015): [A Neurocomputational account of the role of contour facilitation in brightness perception](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4333805/). It can be used to reproduce all its results.
 
+## Installation
+To install this package, you need to clone this repository and run `pip install .` (or `pip3 install .`) inside this directory.
+
+
+
 ## Files and Usage
 
 * `brightness_model.ipyb`:
