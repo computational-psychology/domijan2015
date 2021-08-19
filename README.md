@@ -9,15 +9,16 @@ This repository contains a re-implementation of the physiologically-inspired bri
 * `brightness_model.ipyb`:
 This Jupyter Notebook tries to provide a deeper understanding of the brightness perception model by visualizing and commenting on each processing step.
 
-* `main.py`:
-Running this Python script will create the model outputs for 12 different brightness illusions (Dungeon illusion, Cube illusion, Grating illusion, Ring illusion, Bullseye illusion, Simultaneous Contrast illusion, White's illusion, Benary's Cross, Todorovic illusion, Contrast-contrast illusion, Checkerboard illusion, Extended Checkerboard illusion). All model outputs will be saved in an output folder. The model outputs are comprised of each three figures per illusion that include (1) the Contrast, Luminance and Filled-in Signals, (2) the Local and Global Boundary Signals as well as their integrated outcome, and (3) the final Brightness Percept.
-In order to run this script, simply run:
-```
-python main.py
-```
 
-* `functions.py`:
-Python script in which all functions are defined that are relevant for the model.
+* `demo.py`:
+This script will run the model on all the stimuli from the Domijan 2015 paper and save the outputs in
+the `outputs` directory together with the intermediate results
+  
+
+* `domijan2015/main.py`:
+This module contains the main function for running the model. It depedends on other modules inside
+the `domijan2015` directory.
+  
 
 
 ## Model overview
