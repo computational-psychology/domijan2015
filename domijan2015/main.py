@@ -16,18 +16,19 @@ For more details, see functions.py
 from . import utils, retina, boundary_detection, filling_in
 
 
-# Run the simulations for 12 brightness illusions:
-def main(stimulus, S=20, extensive=False):
+def main(stimulus, S=20, extensive=False, crop=True):
     """
     Parameters
     -----------
     stimulus : Stimulus object
         stimulus on which the model should be run
     S : int
-        size of the added padding during the model calculation
+        size of the added padding during the model calculation (originally 20)
     extensive : bool
         should the model return intermediate results or not (e.g., used for the demo script
         to be able to plot the intermediate results)
+    crop : bool
+        if True, crop the model output to the input size
 
     Returns
     -----------
@@ -52,6 +53,10 @@ def main(stimulus, S=20, extensive=False):
 
     # Filling-in:
     bright, M_ON, M_OFF = filling_in.fill_in(R, m_ON, m_OFF)
+
+    if crop:
+        bright = utils.remove_surround(bright, int(S/2))
+
     if extensive:
         output = {"c_ON": c_ON,
                   "c_OFF": c_OFF,

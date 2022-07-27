@@ -30,7 +30,7 @@ stimlist = [
 @pytest.mark.parametrize("stim", stimlist)
 def test_stim(stim):
     img, _, _ = utils.generate_input(stim[0])
-    res = main.main(img, extensive=False)
+    res = main.main(img, crop=False)
     output = utils.img_to_png(res['model_output'])
     test_output = np.asarray(Image.open(f"{ground_truth_dir}{stim[1]}.png").convert("L"))
     assert utils.compare_arrays(output, test_output), "outputs are different"
