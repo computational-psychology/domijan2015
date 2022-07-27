@@ -1,21 +1,20 @@
 import numpy as np
 from scipy.signal import fftconvolve
-import scipy.ndimage as ndimage
+from scipy.ndimage import maximum_filter as max_filt
 import copy
 
-if __package__ == None or __package__ == "":
+if __package__ is None or __package__ == "":
     import utils
 else:
     from . import utils
 
 
-def get_gabor(size, k, K, Sigma_1 = 1.5, Sigma_2 = 0.5, G = 1, H = 0.5):
-
+def get_gabor(size, k, K, sigma1=1.5, sigma2=0.5, G=1, H=0.5):
     """
     size: size of the filter in pixels
     k, K: used to calculate theta = 2 * PI * k/K
-    Sigma_1: Width of the filter in the preferred orientation
-    Sigma_2: Width of the filter in the orthogonal orientation
+    sigma1: Width of the filter in the preferred orientation
+    sigma2: Width of the filter in the orthogonal orientation
     G: Constant that scales the Gabor amplitude
     H: Controls the frequency of the filter's sinusoidal modulation
     """
@@ -26,7 +25,7 @@ def get_gabor(size, k, K, Sigma_1 = 1.5, Sigma_2 = 0.5, G = 1, H = 0.5):
     theta = (2. * np.pi * float(k)) / float(K)
     U = -xx * np.sin(theta) + yy * np.cos(theta)
     W = xx * np.cos(theta) + yy * np.sin(theta)
-    Gabor = G * np.sin(H * U) * np.exp(-0.5 * ((W / Sigma_1) ** 2 + (U / Sigma_2) ** 2))
+    Gabor = G * np.sin(H * U) * np.exp(-0.5 * ((W / sigma1) ** 2 + (U / sigma2) ** 2))
     return utils.threshold(Gabor), utils.threshold(-Gabor)
 
 
@@ -38,17 +37,15 @@ def get_simple_cells(c_ON, c_OFF, K):
 
     ON = c_ON - c_OFF
     OFF = c_OFF - c_ON
-
-    # Parameters:
     M, N = c_ON.shape
 
     # Output variables for simple and complex cells with K orientations:
     simple_out = np.zeros([M, N, K])
-    T_1 = 0.05  # Threshold that removes weak and noisy boundary responses (simple cell)
+    # Threshold that removes weak and noisy boundary responses (simple cell)
+    T_1 = 0.05
 
     # Create output of simple cortical cells:
-    # For simplicity, only horizontal (k=0) and vertical (k=3) orientations
-    # were used here:
+    # NOTE: only horizontal (k=0) and vertical (k=3) orientations were used:
     for k in range(0, K, 3):
         gaborp, gaborm = get_gabor(21, k, K)
 
@@ -66,13 +63,13 @@ def get_simple_cells(c_ON, c_OFF, K):
 
 
 def get_complex_cells(simple_out):
+    """
+    Create output of complex cortical cells by adding uo simple cell outputs
+    with opposite contrast polarities
+    """
     M, N, K = simple_out.shape
     complex_out = np.zeros([M, N, K])
 
-    ############################# Complex cells ##############################
-    # Create output of complex cortical cells:
-    # For this, simply add up simple cell outputs with opposite
-    # contrast polarities:
     for i in range(int(K / 2)):
         complex_out[:, :, i] = simple_out[:, :, i] + simple_out[:, :, i + int(K / 2)]
 
@@ -80,8 +77,11 @@ def get_complex_cells(simple_out):
 
 
 def LBD(complex_out, L, P):
+    """
+    Local boundary detection. For description, see paper.
+    """
     M, N, K = complex_out.shape
-    ######################## Local boundary detection ########################
+
     # Prepare computation of MAX function: horizontal outputs
     LBD_h = np.zeros([M + 2 * P, N + 2 * P])
     LBD_h[P:M + P, P:N + P] = complex_out[:, :, 5]
@@ -97,24 +97,24 @@ def LBD(complex_out, L, P):
     # Compute MAX function among L nearest neighbors:
     # ... for horizontal outputs:
     LBD_h_temp = LBD_h
-    LBD_h_temp[L - 1:M + L + 2, 0:N + L + L + 1] = ndimage.maximum_filter(temp_h[L - 1:M + L + 2, 0:N + L + L + 1],
-                                                                          size=(3, L * 2 + 1))
+    LBD_h_temp[L-1:M+L+2, 0:N+L+L+1] = max_filt(temp_h[L-1:M+L+2, 0:N+L+L+1], size=(3, L*2+1))
     LBD_h = mask_h * LBD_h_temp
 
     # ... for vertical outputs:
     LBD_v_temp = LBD_v
-    LBD_v_temp[0:M + L + L + 1, L - 1:N + L + 2] = ndimage.maximum_filter(temp_v[0:M + L + L + 1, L - 1:N + L + 2],
-                                                                          size=(L * 2 + 1, 3))
+    LBD_v_temp[0:M+L+L+1, L-1:N+L+2] = max_filt(temp_v[0:M+L+L+1, L-1:N+L+2], size=(L*2+1, 3))
     LBD_v = mask_v * LBD_v_temp
 
     return LBD_h, LBD_v
 
 
 def GBD(LBD_h, LBD_v, P, Q):
+    """
+    Global boundary detection. For description, see paper.
+    """
     M, N = LBD_h.shape
     M, N = M - 2*P, N - 2*P
 
-    ####################### Global boundary detection ########################
     # Prepare variables for recurrent MAX function: horizontal
     temp2_h = LBD_h
     GBD_h = copy.deepcopy(LBD_h)
@@ -131,14 +131,14 @@ def GBD(LBD_h, LBD_v, P, Q):
     GBD_steps = 20
     for t in range(GBD_steps):
         # ... for horizontal outputs
-        GBD_h_temp[P - Q:M + P + Q + 1, 0:N + P + P + 1] = ndimage.maximum_filter(
-            temp2_h[P - Q:M + P + Q + 1, 0:N + P + P + 1], size=(Q * 2 + 1, P * 2 + 1))
+        GBD_h_temp[P-Q:M+P+Q+1, 0:N+P+P+1] = max_filt(temp2_h[P-Q:M+P+Q+1, 0:N+P+P+1],
+                                                      size=(Q*2+1, P*2+1))
         GBD_h = mask2_h * GBD_h_temp
         temp2_h = GBD_h
 
         # ... for vertical outputs
-        GBD_v_temp[0:M + P + P + 1, P - Q:N + P + Q + 1] = ndimage.maximum_filter(
-            temp2_v[0:M + P + P + 1, P - Q:N + P + Q + 1], size=(P * 2 + 1, Q * 2 + 1))
+        GBD_v_temp[0:M+P+P+1, P-Q:N+P+Q+1] = max_filt(temp2_v[0:M+P+P+1, P-Q:N+P+Q+1],
+                                                      size=(P*2+1, Q*2+1))
         GBD_v = mask2_v * GBD_v_temp
         temp2_v = GBD_v
 
@@ -146,10 +146,12 @@ def GBD(LBD_h, LBD_v, P, Q):
 
 
 def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P, extensive=False):
+    """
+    Interaction between local and global boundary detection outputs. For description, see paper.
+    """
     M, N = LBD_h.shape
     M, N = M - 2 * P, N - 2 * P
 
-    ###################### Global / local interaction ########################
     # Combine and binarize LBD and GBD outputs:
     R_h = utils.heaviside((LBD_h / (F + GBD_h)) - T_r)
     R_v = utils.heaviside((LBD_v / (F + GBD_v)) - T_r)
@@ -165,11 +167,14 @@ def LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P, extensive=False):
         return {"R": R}
 
 
-# Function that generates output of the Boundary Contour System:
-def BCS(c_ON, c_OFF, extensive = False):
+def BCS(c_ON, c_OFF, extensive=False):
+    """
+    Function that generates output of the whole Boundary Contour System using the functions
+    described above.
+    """
 
-    K = 12   # Number of orientations
-    # Parameters simple cells:
+    # Parameters simple and complex cells:
+    K = 12   # Number of orientations (only two of them are currently used)
     simple_out = get_simple_cells(c_ON, c_OFF, K)
     complex_out = get_complex_cells(simple_out)
 
@@ -187,7 +192,16 @@ def BCS(c_ON, c_OFF, extensive = False):
 
     lgi_res = LBD_GBD_interaction(LBD_h, LBD_v, GBD_h, GBD_v, T_r, F, P, extensive=extensive)
     R = lgi_res["R"]
-    if extensive:
-        return {"R": R, "R_h": lgi_res["R_h"], "R_v": lgi_res["R_v"], "LBD_h": LBD_h, "LBD_v": LBD_v, "GBD_h": GBD_h, "GBD_v": GBD_v}
 
-    return {"R": R}
+    if extensive:
+        output = {"R": R,
+                  "R_h": lgi_res["R_h"],
+                  "R_v": lgi_res["R_v"],
+                  "LBD_h": LBD_h,
+                  "LBD_v": LBD_v,
+                  "GBD_h": GBD_h,
+                  "GBD_v": GBD_v}
+    else:
+        output = {"R": R}
+
+    return output

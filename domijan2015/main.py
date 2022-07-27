@@ -17,7 +17,7 @@ from . import utils, retina, boundary_detection, filling_in
 
 
 # Run the simulations for 12 brightness illusions:
-def main(stimulus, S, extensive=False):
+def main(stimulus, S=20, extensive=False):
     """
     Parameters
     -----------
@@ -26,11 +26,12 @@ def main(stimulus, S, extensive=False):
     S : int
         size of the added padding during the model calculation
     extensive : bool
-        should the model return intermediate results or not (e.g., used for the demo script to be able to plot the intermediate results)
+        should the model return intermediate results or not (e.g., used for the demo script
+        to be able to plot the intermediate results)
 
     Returns
     -----------
-    {"image": output image} or {"image": output image, <all the intermediate results>}
+    {"model_output": output image} or {"model_output": output image, <all the intermediate results>}
     """
     input_image = utils.add_surround(stimulus, S)
 
@@ -40,7 +41,7 @@ def main(stimulus, S, extensive=False):
     # Contrast and luminance integration in the ON channel:
     w1 = 3.
     w2 = 1.
-    m_ON  = w1*c_ON  + w2*l_ON
+    m_ON = w1*c_ON + w2*l_ON
 
     # Contrast and lumiance integration in the OFF channel
     m_OFF = w1*c_OFF + w2*l_OFF
@@ -52,10 +53,20 @@ def main(stimulus, S, extensive=False):
     # Filling-in:
     bright, M_ON, M_OFF = filling_in.fill_in(R, m_ON, m_OFF)
     if extensive:
-        output = {"c_ON": c_ON, "c_OFF": c_OFF, "l_ON": l_ON, "l_OFF": l_OFF, "M_ON": M_ON, "M_OFF": M_OFF, "R_h": bcs_res["R_h"], "R_v": bcs_res["R_v"],
-                  "image": bright, "LBD_h": bcs_res["LBD_h"], "LBD_v": bcs_res["LBD_v"], "GBD_h": bcs_res["GBD_h"], "GBD_v": bcs_res["GBD_v"]}
+        output = {"c_ON": c_ON,
+                  "c_OFF": c_OFF,
+                  "l_ON": l_ON,
+                  "l_OFF": l_OFF,
+                  "M_ON": M_ON,
+                  "M_OFF": M_OFF,
+                  "R_h": bcs_res["R_h"],
+                  "R_v": bcs_res["R_v"],
+                  "model_output": bright,
+                  "LBD_h": bcs_res["LBD_h"],
+                  "LBD_v": bcs_res["LBD_v"],
+                  "GBD_h": bcs_res["GBD_h"],
+                  "GBD_v": bcs_res["GBD_v"]}
     else:
-        output= {"image": bright}
-
+        output = {"model_output": bright}
 
     return output

@@ -5,28 +5,30 @@ from PIL import Image
 from matplotlib.animation import FuncAnimation
 
 
-
-
-#Threshold-linear function:
 def threshold(x):
-    y = x * (x > 0).astype(np.float)
+    """
+    Threshold-linear function
+    """
+    y = x * (x > 0).astype(float)
     return np.abs(y)
 
 
-# Heaviside step function:
 def heaviside(x):
-    y = (x > 0).astype(np.float)
+    """
+    Heaviside step function:
+    """
+    y = (x > 0).astype(float)
     return np.abs(y)
 
 
-# Sigmoid function with S_max controlling the upper saturation point:
 def sigmoid(S_max, x):
-    y = (x < S_max) * (x * (x > 0).astype(np.float)) + S_max * (x >= S_max)
+    """
+    Sigmoid function with S_max controlling the upper saturation point
+    """
+    y = (x < S_max) * (x * (x > 0).astype(float)) + S_max * (x >= S_max)
     return np.abs(y)
 
 
-
-# Save a video:
 def save_video(video1, video2, fname, fps, figsize=(10, 3)):
     """
     Save 3D arrays as MP4 videos, using matplotlib.animate.
@@ -63,13 +65,9 @@ def save_video(video1, video2, fname, fps, figsize=(10, 3)):
     plt.close()
 
 
-
-
-# Function that generates input image:
 def generate_input(a):
     """
-    Generate input image according to the passed parameter
-    TODO: each call to this function should be replaced by a call to a function from the stimulus package
+    Generate input image
     """
     DUNGEON_BRESSAN_2001 = 1
     CUBE_AGOSTINI_GALMONTE_2002 = 2
@@ -278,8 +276,8 @@ def generate_input(a):
         for i in range(29, 60, 20):
             for j in range(29, 60, 20):
                 input_image[i:i + 10, j:j + 10] = (lum_black + lum_gray) / 2.
-                k, l = i + 10, j + 10
-                input_image[k:k + 10, l:l + 10] = (lum_black + lum_gray) / 2.
+                k, m = i + 10, j + 10
+                input_image[k:k + 10, m:m + 10] = (lum_black + lum_gray) / 2.
 
         input_image[29:69, 129:169] = input_image[29:69, 29:69]
 
@@ -292,8 +290,8 @@ def generate_input(a):
         for i in range(9, 80, 20):
             for j in range(9, 80, 20):
                 input_image[i:i + 10, j:j + 10] = lum_black
-                k, l = i + 10, j + 10
-                input_image[k:k + 10, l:l + 10] = lum_black
+                k, m = i + 10, j + 10
+                input_image[k:k + 10, m:m + 10] = lum_black
 
         input_image[39:49, 29:39] = lum_gray
         input_image[59:69, 59:69] = lum_gray
@@ -307,8 +305,8 @@ def generate_input(a):
         for i in range(9, 80, 20):
             for j in range(9, 80, 20):
                 input_image[i:i + 10, j:j + 10] = lum_black
-                k, l = i + 10, j + 10
-                input_image[k:k + 10, l:l + 10] = lum_black
+                k, m = i + 10, j + 10
+                input_image[k:k + 10, m:m + 10] = lum_black
 
         input_image[39:49, 19:49] = lum_gray
         input_image[59:69, 49:79] = lum_gray
@@ -321,20 +319,22 @@ def generate_input(a):
     return input_image, name, cut_height
 
 
-def add_surround(input_raw, size=20):
-    # Add mid-gray surround to the image
+def add_surround(input_raw, size=10):
+    """
+    Add mid-gray surround to the image
+    """
     M, N = input_raw.shape
     image = 5 * np.ones([M + 2 * size, N + 2 * size])
     image[size - 1:M + size - 1, size - 1:N + size - 1] = input_raw
     return image
 
-def remove_surround(input_raw, size=20):
-    img = np.delete(input_raw, np.s_[:size], 0)
-    img = np.delete(img, np.s_[-size:], 0)
-    img = np.delete(img, np.s_[:size], 1)
-    img = np.delete(img, np.s_[-size:], 1)
-    return img
 
+def remove_surround(input_raw, size=10):
+    """
+    Crop image, removing the added surround
+    """
+    img = input_raw[size-1:input_raw.shape[0]-size-1, size-1:input_raw.shape[1]-size-1]
+    return img
 
 
 def img_to_png(img):
@@ -346,21 +346,21 @@ def img_to_png(img):
         tmpFile = io.BytesIO()
         plt.imsave(tmpFile, img, format="png")
         return np.asarray(Image.open(tmpFile).convert("L"))
-    except Exception as e:
-        print("Something went wrong trying to convert img to png. See the error below for more details.")
+    except Exception:
+        print("Something went wrong trying to convert img to png.")
         raise
-
 
 
 def compare_arrays(img1, img2, threshold=0.01):
     """
-    Compares two images that are given in the form of numpy array. It computes the difference between the two arrays
-    and returns true if the calculated difference divided by the number of pixels is less or equal than the given threshold (defaults to 1%)
+    Compares two images that are given in the form of numpy array. It computes the difference
+    between the two arrays and returns true if the calculated difference divided by the number
+    of pixels is less or equal than the given threshold (defaults to 1%)
     """
     try:
         diff = np.sum(np.abs(np.subtract(img1, img2)))
         pixels = img1.shape[0]*img1.shape[1]
         return diff/pixels < threshold
     except Exception:
-        print("Something went wrong comparing arrays. See the error below for more details.")
+        print("Something went wrong comparing arrays.")
         raise
